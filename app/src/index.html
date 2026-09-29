@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>DevOps Mini Project</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f3ee;
+  --ink:#1a1814;
+  --ink2:#5c584f;
+  --ink3:#9c9789;
+  --cream:#fffdf7;
+  --card:#ffffff;
+  --border:#e8e4da;
+  --green:#1a6b45;
+  --green-bg:#e8f5ee;
+  --amber:#8a5c00;
+  --amber-bg:#fef3d6;
+  --blue:#1a4a8a;
+  --blue-bg:#e6eef8;
+  --red:#8a1a1a;
+  --red-bg:#fde8e8;
+  --accent:#2d5a27;
+  --accent2:#c85c00;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:'Cabinet Grotesk',sans-serif;
+  min-height:100vh;
+}
+/* Grain texture overlay */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9999;opacity:0.6;
+}
+
+/* NAV */
+nav{
+  background:var(--ink);
+  padding:0 48px;
+  display:flex;align-items:center;justify-content:space-between;
+  height:56px;position:sticky;top:0;z-index:100;
+}
+.nav-logo{
+  font-family:'DM Mono',monospace;font-size:13px;
+  color:#f5f3ee;display:flex;align-items:center;gap:10px;
+}
+.nav-dot{
+  width:8px;height:8px;border-radius:50%;background:#4ade80;
+  animation:blink 2s infinite;
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.nav-links{display:flex;gap:32px}
+.nav-links a{
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:#9c9789;text-decoration:none;letter-spacing:0.05em;
+  text-transform:uppercase;transition:color .2s;
+}
+.nav-links a:hover{color:#f5f3ee}
+.nav-status{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(74,222,128,0.1);
+  border:1px solid rgba(74,222,128,0.2);
+  border-radius:20px;padding:4px 12px;
+  font-family:'DM Mono',monospace;font-size:10px;color:#4ade80;
+}
+
+/* HERO */
+.hero{
+  padding:80px 48px 60px;
+  max-width:1200px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
+}
+.hero-eyebrow{
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:var(--ink3);letter-spacing:0.12em;text-transform:uppercase;
+  margin-bottom:20px;display:flex;align-items:center;gap:8px;
+}
+.hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--ink3)}
+h1{
+  font-family:'Clash Display',sans-serif;
+  font-size:clamp(3rem,5vw,4.5rem);
+  font-weight:700;line-height:1;
+  letter-spacing:-0.03em;
+  color:var(--ink);
+  margin-bottom:24px;
+}
+h1 .line2{color:var(--accent)}
+.hero-desc{
+  font-size:16px;color:var(--ink2);line-height:1.7;
+  max-width:400px;margin-bottom:36px;
+}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:12px 24px;border-radius:8px;
+  font-family:'Cabinet Grotesk',sans-serif;
+  font-size:14px;font-weight:700;cursor:pointer;
+  border:none;text-decoration:none;transition:all .2s;
+}
+.btn-primary{background:var(--ink);color:var(--cream)}
+.btn-primary:hover{background:#2d2a24;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--ink);border:1.5px solid var(--border)}
+.btn-outline:hover{background:var(--card);border-color:var(--ink3)}
+
+/* PIPELINE VISUAL */
+.pipeline-card{
+  background:var(--ink);
+  border-radius:20px;padding:32px;
+  position:relative;overflow:hidden;
+}
+.pipeline-card::before{
+  content:'';position:absolute;
+  width:200px;height:200px;border-radius:50%;
+  background:rgba(45,90,39,0.3);
+  top:-60px;right:-60px;filter:blur(60px);
+}
+.pipeline-label{
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:rgba(245,243,238,0.4);text-transform:uppercase;
+  letter-spacing:0.1em;margin-bottom:24px;
+}
+.pipe-stages{display:flex;flex-direction:column;gap:2px}
+.pipe-stage{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;border-radius:8px;
+  transition:background .2s;cursor:default;
+}
+.pipe-stage:hover{background:rgba(255,255,255,0.04)}
+.pipe-icon-wrap{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;flex-shrink:0;
+}
+.ps-green{background:rgba(74,222,128,0.15)}
+.ps-amber{background:rgba(251,191,36,0.15)}
+.ps-blue{background:rgba(96,165,250,0.15)}
+.ps-purple{background:rgba(167,139,250,0.15)}
+.pipe-stage-info{flex:1}
+.psi-name{font-size:13px;font-weight:600;color:#f5f3ee}
+.psi-sub{font-size:11px;color:rgba(245,243,238,0.45);font-family:'DM Mono',monospace}
+.psi-time{
+  font-family:'DM Mono',monospace;font-size:10px;
+  color:rgba(245,243,238,0.35);
+}
+.pipe-connector{
+  width:1px;height:12px;background:rgba(255,255,255,0.1);
+  margin:0 0 0 27px;
+}
+.pipe-status{
+  width:8px;height:8px;border-radius:50%;
+  animation:pulse-green 2s infinite;
+}
+.pipe-done{background:#4ade80;animation:none}
+.pipe-running{background:#fbbf24;animation:pulse-amber 1.5s infinite}
+.pipe-wait{background:rgba(255,255,255,0.2);animation:none}
+@keyframes pulse-green{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,0.4)}50%{box-shadow:0 0 0 6px rgba(74,222,128,0)}}
+@keyframes pulse-amber{0%,100%{box-shadow:0 0 0 0 rgba(251,191,36,0.4)}50%{box-shadow:0 0 0 6px rgba(251,191,36,0)}}
+
+/* STATS */
+.stats-row{
+  max-width:1200px;margin:0 auto;padding:0 48px 60px;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+}
+.stat-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;padding:24px;
+}
+.stat-icon{font-size:20px;margin-bottom:12px}
+.stat-num{
+  font-family:'DM Mono',monospace;
+  font-size:2rem;font-weight:500;
+  color:var(--ink);line-height:1;margin-bottom:6px;
+}
+.stat-lbl{font-size:13px;color:var(--ink3)}
+
+/* SECTION */
+.section{
+  max-width:1200px;margin:0 auto;padding:0 48px 80px;
+}
+.sec-header{
+  display:flex;align-items:baseline;gap:16px;
+  margin-bottom:32px;padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.sec-num{
+  font-family:'DM Mono',monospace;font-size:12px;
+  color:var(--ink3);
+}
+.sec-title{
+  font-family:'Clash Display',sans-serif;
+  font-size:1.6rem;font-weight:600;
+  letter-spacing:-0.02em;
+}
+.sec-badge{
+  margin-left:auto;
+  font-family:'DM Mono',monospace;font-size:10px;
+  padding:3px 10px;border-radius:20px;
+  background:var(--green-bg);color:var(--green);
+  border:1px solid rgba(26,107,69,0.15);
+}
+
+/* STEPS */
+.steps-grid{display:flex;flex-direction:column;gap:12px}
+.step{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;
+}
+.step-head{
+  display:flex;align-items:center;gap:16px;
+  padding:16px 20px;cursor:pointer;
+  transition:background .15s;
+}
+.step-head:hover{background:#faf9f6}
+.step-n{
+  width:32px;height:32px;border-radius:8px;
+  background:var(--bg);border:1px solid var(--border);
+  font-family:'DM Mono',monospace;font-size:12px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--ink2);flex-shrink:0;
+}
+.step-ttl{font-size:15px;font-weight:600;flex:1}
+.step-pill{
+  font-family:'DM Mono',monospace;font-size:10px;
+  padding:3px 9px;border-radius:20px;
+}
+.pill-cmd{background:var(--blue-bg);color:var(--blue)}
+.pill-file{background:var(--green-bg);color:var(--green)}
+.pill-cfg{background:var(--amber-bg);color:var(--amber)}
+.pill-deploy{background:#f0e8f5;color:#5b1a8a}
+.step-arr{color:var(--ink3);font-size:12px;transition:transform .2s;flex-shrink:0}
+.step.open .step-arr{transform:rotate(180deg)}
+.step-body{display:none;padding:0 20px 20px}
+.step.open .step-body{display:block}
+.step-desc{font-size:13px;color:var(--ink2);line-height:1.7;margin-bottom:14px}
+.step-desc strong{color:var(--ink);font-weight:600}
+
+/* CODE */
+.code-block{
+  background:var(--ink);border-radius:12px;
+  overflow:hidden;margin:10px 0;
+}
+.code-top{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:#252118;
+}
+.code-fn{font-family:'DM Mono',monospace;font-size:10px;color:var(--ink3)}
+.copy-btn{
+  background:none;border:1px solid rgba(255,255,255,0.1);
+  color:rgba(255,255,255,0.4);font-family:'DM Mono',monospace;
+  font-size:10px;padding:3px 10px;border-radius:5px;cursor:pointer;
+  transition:all .2s;
+}
+.copy-btn:hover{border-color:rgba(74,222,128,0.5);color:#4ade80}
+pre{
+  padding:16px;
+  font-family:'DM Mono',monospace;font-size:12px;
+  line-height:1.75;color:#c9cbb8;
+  overflow-x:auto;white-space:pre;
+}
+.kw{color:#ff8c69}
+.str{color:#87ceeb}
+.cm{color:#636057;font-style:italic}
+.va{color:#4ade80}
+.nm{color:#c9a0dc}
+
+.note{
+  background:var(--amber-bg);border:1px solid rgba(138,92,0,0.15);
+  border-radius:10px;padding:12px 16px;
+  font-size:12px;color:var(--amber);
+  line-height:1.6;margin-top:10px;
+}
+.note strong{font-weight:600}
+.ok{
+  background:var(--green-bg);border:1px solid rgba(26,107,69,0.15);
+  border-radius:10px;padding:12px 16px;
+  font-size:12px;color:var(--green);
+  line-height:1.6;margin-top:10px;
+}
+.err{
+  background:var(--red-bg);border:1px solid rgba(138,26,26,0.15);
+  border-radius:10px;padding:12px 16px;
+  font-size:12px;color:var(--red);
+  line-height:1.6;margin-top:10px;
+}
+
+/* WORKFLOW VISUAL */
+.workflow-vis{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:16px;padding:32px;margin-bottom:32px;
+  text-align:center;
+}
+.workflow-row{
+  display:flex;align-items:center;justify-content:center;
+  gap:0;flex-wrap:wrap;
+}
+.wf-node{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  min-width:90px;
+}
+.wf-circle{
+  width:56px;height:56px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;border:2px solid var(--border);
+  background:var(--bg);transition:all .2s;
+}
+.wf-circle:hover{transform:scale(1.05)}
+.wf-name{font-size:11px;font-weight:600;color:var(--ink)}
+.wf-sub{font-family:'DM Mono',monospace;font-size:9px;color:var(--ink3)}
+.wf-arrow{
+  width:36px;height:2px;background:var(--border);
+  position:relative;margin-bottom:20px;flex-shrink:0;
+}
+.wf-arrow::after{
+  content:'';position:absolute;right:-5px;top:-4px;
+  border-top:5px solid transparent;
+  border-bottom:5px solid transparent;
+  border-left:8px solid var(--border);
+}
+
+/* FOOTER */
+footer{
+  background:var(--ink);padding:40px 48px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.footer-brand{
+  font-family:'DM Mono',monospace;font-size:12px;color:rgba(245,243,238,0.5);
+}
+.footer-repo{
+  font-family:'DM Mono',monospace;font-size:11px;
+  color:rgba(245,243,238,0.3);
+}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;gap:40px;padding:48px 24px 40px}
+  .stats-row{grid-template-columns:repeat(2,1fr);padding:0 24px 48px}
+  .section{padding:0 24px 60px}
+  nav{padding:0 24px}
+  footer{flex-direction:column;gap:12px;text-align:center;padding:32px 24px}
+}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+.hero-eyebrow{animation:fadeUp .5s .1s both}
+h1{animation:fadeUp .5s .2s both}
+.hero-desc{animation:fadeUp .5s .3s both}
+.hero-ctas{animation:fadeUp .5s .4s both}
+.pipeline-card{animation:fadeUp .5s .5s both}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">
+    <div class="nav-dot"></div>
+    devops_mini_project
+  </div>
+  <div class="nav-links">
+    <a href="#pipeline">Pipeline</a>
+    <a href="#setup">Setup</a>
+    <a href="#deploy">Deploy</a>
+  </div>
+  <div class="nav-status">● Live</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-eyebrow">SumitaM-tech / devops_mini_project</div>
+    <h1>Automate.<br><span class="line2">Build.<br>Ship.</span></h1>
+    <p class="hero-desc">Production-grade CI/CD pipeline with Docker, GitHub Actions, and Nginx. Every git push triggers automated tests, builds, and zero-downtime deployment.</p>
+    <div class="hero-ctas">
+      <a href="https://github.com/SumitaM-tech/devops_mini_project" target="_blank" class="btn btn-primary">View on GitHub →</a>
+      <a href="/health" class="btn btn-outline">Health Check</a>
+    </div>
+  </div>
+
+  <div class="pipeline-card">
+    <div class="pipeline-label">Pipeline — last run</div>
+    <div class="pipe-stages">
+      <div class="pipe-stage">
+        <div class="pipe-icon-wrap ps-green">🔍</div>
+        <div class="pipe-stage-info">
+          <div class="psi-name">Lint &amp; Test</div>
+          <div class="psi-sub">jest --coverage · eslint</div>
+        </div>
+        <div class="psi-time">28s</div>
+        <div class="pipe-status pipe-done"></div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage">
+        <div class="pipe-icon-wrap ps-blue">🐳</div>
+        <div class="pipe-stage-info">
+          <div class="psi-name">Docker Build</div>
+          <div class="psi-sub">multi-stage · alpine</div>
+        </div>
+        <div class="psi-time">54s</div>
+        <div class="pipe-status pipe-done"></div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage">
+        <div class="pipe-icon-wrap ps-purple">📦</div>
+        <div class="pipe-stage-info">
+          <div class="psi-name">Push to GHCR</div>
+          <div class="psi-sub">ghcr.io / latest</div>
+        </div>
+        <div class="psi-time">18s</div>
+        <div class="pipe-status pipe-done"></div>
+      </div>
+      <div class="pipe-connector"></div>
+      <div class="pipe-stage">
+        <div class="pipe-icon-wrap ps-amber">🚀</div>
+        <div class="pipe-stage-info">
+          <div class="psi-name">Deploy</div>
+          <div class="psi-sub">ssh · rolling update</div>
+        </div>
+        <div class="psi-time">22s</div>
+        <div class="pipe-status pipe-running"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-icon">⚡</div>
+    <div class="stat-num" id="uptime">--</div>
+    <div class="stat-lbl">Uptime (seconds)</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🧠</div>
+    <div class="stat-num" id="memUsed">--</div>
+    <div class="stat-lbl">Memory used</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🏷</div>
+    <div class="stat-num" id="version">--</div>
+    <div class="stat-lbl">App version</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🌿</div>
+    <div class="stat-num" id="env">--</div>
+    <div class="stat-lbl">Environment</div>
+  </div>
+</div>
+
+<!-- PIPELINE SECTION -->
+<section class="section" id="pipeline">
+  <div class="sec-header">
+    <span class="sec-num">01</span>
+    <h2 class="sec-title">How the pipeline works</h2>
+    <span class="sec-badge">GitHub Actions</span>
+  </div>
+
+  <div class="workflow-vis">
+    <div class="workflow-row">
+      <div class="wf-node">
+        <div class="wf-circle">📝</div>
+        <div class="wf-name">Push Code</div>
+        <div class="wf-sub">git push main</div>
+      </div>
+      <div class="wf-arrow"></div>
+      <div class="wf-node">
+        <div class="wf-circle">✅</div>
+        <div class="wf-name">Test</div>
+        <div class="wf-sub">jest + eslint</div>
+      </div>
+      <div class="wf-arrow"></div>
+      <div class="wf-node">
+        <div class="wf-circle">🐳</div>
+        <div class="wf-name">Build</div>
+        <div class="wf-sub">docker buildx</div>
+      </div>
+      <div class="wf-arrow"></div>
+      <div class="wf-node">
+        <div class="wf-circle">📦</div>
+        <div class="wf-name">Registry</div>
+        <div class="wf-sub">ghcr.io push</div>
+      </div>
+      <div class="wf-arrow"></div>
+      <div class="wf-node">
+        <div class="wf-circle">🔐</div>
+        <div class="wf-name">Deploy</div>
+        <div class="wf-sub">ssh + compose</div>
+      </div>
+      <div class="wf-arrow"></div>
+      <div class="wf-node">
+        <div class="wf-circle">🩺</div>
+        <div class="wf-name">Health</div>
+        <div class="wf-sub">curl /health</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SETUP SECTION -->
+<section class="section" id="setup">
+  <div class="sec-header">
+    <span class="sec-num">02</span>
+    <h2 class="sec-title">Step-by-step setup</h2>
+    <span class="sec-badge">Follow in order</span>
+  </div>
+  <div class="steps-grid" id="stepsGrid"></div>
+</section>
+
+<footer>
+  <div class="footer-brand">DevOps Mini Project — SumitaM-tech</div>
+  <div class="footer-repo">github.com/SumitaM-tech/devops_mini_project</div>
+</footer>
+
+<script>
+// Live stats
+fetch('/api/info').then(r=>r.json()).then(d=>{
+  document.getElementById('uptime').textContent=d.uptime||'0s';
+  document.getElementById('memUsed').textContent=d.memory?.used||'--';
+  document.getElementById('version').textContent=d.version||'1.0.0';
+  document.getElementById('env').textContent=d.environment||'dev';
+}).catch(()=>{
+  document.getElementById('uptime').textContent='0s';
+  document.getElementById('memUsed').textContent='--MB';
+  document.getElementById('version').textContent='1.0.0';
+  document.getElementById('env').textContent='local';
+});
+
+// Steps
+var STEPS=[
+  {n:'01',title:'Clone your GitHub repo',pill:'cmd',pillClass:'pill-cmd',body:`
+<p class="step-desc">Open your terminal. Clone the empty repo you just created on GitHub.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">terminal</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>git clone https://github.com/SumitaM-tech/devops_mini_project.git
+cd devops_mini_project</pre></div>
+<div class="ok">✓ You are now inside your project folder. All commands below run from here.</div>`},
+
+  {n:'02',title:'Create the project folder structure',pill:'cmd',pillClass:'pill-cmd',body:`
+<p class="step-desc">Create all the required folders in one command.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">terminal — run inside devops_mini_project/</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>mkdir -p app/src .github/workflows nginx scripts</pre></div>
+<div class="ok">✓ Folder structure: app/src, .github/workflows, nginx, scripts</div>`},
+
+  {n:'03',title:'Create app/server.js — Express backend',pill:'file',pillClass:'pill-file',body:`
+<p class="step-desc">Create the Node.js server file. This is the backend that serves the app and exposes health/info endpoints.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">app/server.js</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre><span class="kw">const</span> express = <span class="nm">require</span>(<span class="str">'express'</span>);
+<span class="kw">const</span> path = <span class="nm">require</span>(<span class="str">'path'</span>);
+<span class="kw">const</span> os = <span class="nm">require</span>(<span class="str">'os'</span>);
+<span class="kw">const</span> app = <span class="nm">express</span>();
+<span class="kw">const</span> PORT = process.env.PORT || <span class="nm">3000</span>;
+<span class="kw">const</span> ENV = process.env.NODE_ENV || <span class="str">'development'</span>;
+<span class="kw">const</span> VERSION = process.env.APP_VERSION || <span class="str">'1.0.0'</span>;
+
+app.use(express.json());
+app.use(express.static(path.join(__dirname, <span class="str">'src'</span>)));
+
+app.get(<span class="str">'/health'</span>, (req, res) => res.json({
+  status: <span class="str">'healthy'</span>, version: VERSION,
+  environment: ENV, uptime: process.uptime(),
+  hostname: os.hostname(), timestamp: <span class="kw">new</span> Date().toISOString()
+}));
+
+app.get(<span class="str">'/api/info'</span>, (req, res) => res.json({
+  app: <span class="str">'devops_mini_project'</span>, version: VERSION,
+  environment: ENV, node: process.version,
+  memory: {
+    used: Math.round(process.memoryUsage().heapUsed/1024/1024) + <span class="str">'MB'</span>,
+    total: Math.round(process.memoryUsage().heapTotal/1024/1024) + <span class="str">'MB'</span>
+  },
+  uptime: Math.round(process.uptime()) + <span class="str">'s'</span>
+}));
+
+app.get(<span class="str">'*'</span>, (req, res) =>
+  res.sendFile(path.join(__dirname, <span class="str">'src'</span>, <span class="str">'index.html'</span>)));
+
+app.listen(PORT, () =>
+  console.log(<span class="str">\`🚀 Running on \${PORT} [\${ENV}]\`</span>));
+
+module.exports = app;</pre></div>`},
+
+  {n:'04',title:'Create app/package.json',pill:'file',pillClass:'pill-file',body:`
+<div class="code-block"><div class="code-top"><span class="code-fn">app/package.json</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>{
+  <span class="str">"name"</span>: <span class="str">"devops-mini-project"</span>,
+  <span class="str">"version"</span>: <span class="str">"1.0.0"</span>,
+  <span class="str">"main"</span>: <span class="str">"server.js"</span>,
+  <span class="str">"scripts"</span>: {
+    <span class="str">"start"</span>: <span class="str">"node server.js"</span>,
+    <span class="str">"dev"</span>: <span class="str">"nodemon server.js"</span>,
+    <span class="str">"test"</span>: <span class="str">"jest --coverage --forceExit"</span>
+  },
+  <span class="str">"dependencies"</span>: { <span class="str">"express"</span>: <span class="str">"^4.18.2"</span> },
+  <span class="str">"devDependencies"</span>: {
+    <span class="str">"jest"</span>: <span class="str">"^29.6.1"</span>,
+    <span class="str">"nodemon"</span>: <span class="str">"^3.0.1"</span>,
+    <span class="str">"supertest"</span>: <span class="str">"^6.3.3"</span>
+  },
+  <span class="str">"engines"</span>: { <span class="str">"node"</span>: <span class="str">">=18.0.0"</span> },
+  <span class="str">"jest"</span>: { <span class="str">"testEnvironment"</span>: <span class="str">"node"</span> }
+}</pre></div>`},
+
+  {n:'05',title:'Create app/server.test.js — Tests',pill:'file',pillClass:'pill-file',body:`
+<p class="step-desc">GitHub Actions runs these tests before every build. If any test fails, the pipeline stops and does NOT deploy.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">app/server.test.js</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre><span class="kw">const</span> request = <span class="nm">require</span>(<span class="str">'supertest'</span>);
+<span class="kw">const</span> app = <span class="nm">require</span>(<span class="str">'./server'</span>);
+
+describe(<span class="str">'Health & API'</span>, () => {
+  it(<span class="str">'GET /health → 200 healthy'</span>, async () => {
+    <span class="kw">const</span> res = await request(app).get(<span class="str">'/health'</span>);
+    expect(res.statusCode).toBe(<span class="nm">200</span>);
+    expect(res.body.status).toBe(<span class="str">'healthy'</span>);
+  });
+  it(<span class="str">'GET /api/info → has version'</span>, async () => {
+    <span class="kw">const</span> res = await request(app).get(<span class="str">'/api/info'</span>);
+    expect(res.statusCode).toBe(<span class="nm">200</span>);
+    expect(res.body).toHaveProperty(<span class="str">'version'</span>);
+  });
+  it(<span class="str">'GET / → serves frontend'</span>, async () => {
+    <span class="kw">const</span> res = await request(app).get(<span class="str">'/'</span>);
+    expect(res.statusCode).toBe(<span class="nm">200</span>);
+  });
+});</pre></div>`},
+
+  {n:'06',title:'Create Dockerfile — Multi-stage build',pill:'file',pillClass:'pill-file',body:`
+<p class="step-desc">Two stages: <strong>builder</strong> installs dependencies, <strong>production</strong> copies only what's needed. Result: a small, secure image.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">Dockerfile  ← in project root</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre><span class="cm"># ── Stage 1: Install deps ──</span>
+<span class="kw">FROM</span> node:18-alpine <span class="kw">AS</span> builder
+<span class="kw">WORKDIR</span> /app
+<span class="kw">COPY</span> app/package*.json ./
+<span class="kw">RUN</span> npm ci --only=production
+
+<span class="cm"># ── Stage 2: Production image ──</span>
+<span class="kw">FROM</span> node:18-alpine <span class="kw">AS</span> production
+<span class="kw">WORKDIR</span> /app
+
+<span class="cm"># Non-root user for security</span>
+<span class="kw">RUN</span> addgroup -g 1001 -S nodejs && \
+    adduser -S appuser -u 1001 -G nodejs
+
+<span class="kw">COPY</span> --from=builder --chown=appuser:nodejs /app/node_modules ./node_modules
+<span class="kw">COPY</span> --chown=appuser:nodejs app/server.js ./
+<span class="kw">COPY</span> --chown=appuser:nodejs app/src ./src
+
+<span class="kw">USER</span> appuser
+<span class="kw">EXPOSE</span> 3000
+
+<span class="kw">HEALTHCHECK</span> --interval=30s --timeout=10s --retries=3 \
+  <span class="kw">CMD</span> wget -qO- http://localhost:3000/health || exit 1
+
+<span class="kw">CMD</span> ["node", "server.js"]</pre></div>`},
+
+  {n:'07',title:'Create docker-compose.yml',pill:'file',pillClass:'pill-file',body:`
+<div class="code-block"><div class="code-top"><span class="code-fn">docker-compose.yml  ← project root</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre><span class="va">version</span>: <span class="str">'3.9'</span>
+<span class="va">services</span>:
+  <span class="va">app</span>:
+    build: { context: ., target: production }
+    container_name: devops-mini-app
+    ports: [<span class="str">"3000:3000"</span>]
+    environment:
+      - NODE_ENV=<span class="str">\${NODE_ENV:-development}</span>
+      - APP_VERSION=<span class="str">\${APP_VERSION:-1.0.0}</span>
+    restart: unless-stopped
+    healthcheck:
+      test: [<span class="str">"CMD"</span>,<span class="str">"wget"</span>,<span class="str">"-qO-"</span>,<span class="str">"http://localhost:3000/health"</span>]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks: [app-net]
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: devops-mini-nginx
+    ports: [<span class="str">"80:80"</span>]
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      app: { condition: service_healthy }
+    restart: unless-stopped
+    networks: [app-net]
+
+<span class="va">networks</span>:
+  app-net: { driver: bridge }</pre></div>`},
+
+  {n:'08',title:'Create nginx/nginx.conf',pill:'cfg',pillClass:'pill-cfg',body:`
+<div class="code-block"><div class="code-top"><span class="code-fn">nginx/nginx.conf</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>events { worker_connections 1024; }
+http {
+  include mime.types; default_type application/octet-stream;
+  gzip on; gzip_types text/plain application/json text/css;
+
+  upstream app_upstream { server app:3000; keepalive 32; }
+
+  server {
+    listen 80; server_name _;
+    add_header X-Frame-Options DENY;
+    add_header X-Content-Type-Options nosniff;
+
+    location / {
+      proxy_pass http://app_upstream;
+      proxy_http_version 1.1;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_cache_bypass $http_upgrade;
+    }
+    location /health {
+      proxy_pass http://app_upstream/health;
+      access_log off;
+    }
+  }
+}</pre></div>`},
+
+  {n:'09',title:'Create .github/workflows/ci-cd.yml — The Pipeline',pill:'deploy',pillClass:'pill-deploy',body:`
+<p class="step-desc">This is the <strong>most important file</strong>. It defines the 3-job pipeline that runs on every push to main.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">.github/workflows/ci-cd.yml</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre><span class="va">name</span>: DevOps Mini Project CI/CD
+
+<span class="va">on</span>:
+  push: { branches: [main] }
+  pull_request: { branches: [main] }
+
+<span class="va">env</span>:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: <span class="str">\${{ github.repository }}</span>
+
+<span class="va">jobs</span>:
+  <span class="cm"># ── Job 1: Test ──</span>
+  test:
+    <span class="va">name</span>: Test
+    <span class="va">runs-on</span>: ubuntu-latest
+    <span class="va">steps</span>:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: <span class="str">'18'</span>, cache: <span class="str">'npm'</span>, cache-dependency-path: app/package-lock.json }
+      - run: cd app && npm ci
+      - run: cd app && npm test
+
+  <span class="cm"># ── Job 2: Build & Push Docker Image ──</span>
+  build:
+    <span class="va">name</span>: Build & Push
+    <span class="va">runs-on</span>: ubuntu-latest
+    <span class="va">needs</span>: test
+    <span class="va">if</span>: github.ref == <span class="str">'refs/heads/main'</span>
+    <span class="va">permissions</span>: { contents: read, packages: write }
+    <span class="va">steps</span>:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: <span class="str">\${{ env.REGISTRY }}</span>
+          username: <span class="str">\${{ github.actor }}</span>
+          password: <span class="str">\${{ secrets.GITHUB_TOKEN }}</span>
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: <span class="str">\${{ env.REGISTRY }}/\${{ env.IMAGE_NAME }}</span>
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: <span class="str">\${{ steps.meta.outputs.tags }}</span>
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  <span class="cm"># ── Job 3: Deploy ──</span>
+  deploy:
+    <span class="va">name</span>: Deploy
+    <span class="va">runs-on</span>: ubuntu-latest
+    <span class="va">needs</span>: build
+    <span class="va">environment</span>: production
+    <span class="va">steps</span>:
+      - uses: actions/checkout@v4
+      - uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: <span class="str">\${{ secrets.SERVER_HOST }}</span>
+          username: <span class="str">\${{ secrets.SERVER_USER }}</span>
+          key: <span class="str">\${{ secrets.SSH_PRIVATE_KEY }}</span>
+          script: |
+            cd /opt/devops_mini_project
+            docker compose pull
+            docker compose up -d --no-build
+            docker system prune -f
+      - run: sleep 15
+      - run: curl -f http://<span class="str">\${{ secrets.SERVER_HOST }}</span>/health || exit 1</pre></div>
+<div class="note">📁 The file must be at exactly: <strong>.github/workflows/ci-cd.yml</strong> — lowercase, no spaces.</div>`},
+
+  {n:'10',title:'Create .dockerignore and .gitignore',pill:'file',pillClass:'pill-file',body:`
+<div class="code-block"><div class="code-top"><span class="code-fn">.dockerignore  ← project root</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>node_modules
+.git
+.env
+coverage
+*.test.js
+.github
+README.md</pre></div>
+<div class="code-block" style="margin-top:10px"><div class="code-top"><span class="code-fn">.gitignore  ← project root</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>node_modules/
+.env
+coverage/
+*.log
+.DS_Store</pre></div>`},
+
+  {n:'11',title:'Install dependencies & generate package-lock.json',pill:'cmd',pillClass:'pill-cmd',body:`
+<p class="step-desc">Run this locally to create <strong>package-lock.json</strong> — required by npm ci in the pipeline.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">terminal</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>cd app
+npm install
+cd ..</pre></div>
+<div class="ok">✓ This creates app/node_modules/ and app/package-lock.json</div>`},
+
+  {n:'12',title:'Test locally with Docker',pill:'cmd',pillClass:'pill-cmd',body:`
+<p class="step-desc">Before pushing to GitHub, verify everything works locally.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">terminal — from project root</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre><span class="cm"># Build and start</span>
+docker compose up --build
+
+<span class="cm"># In a new terminal, test it:</span>
+curl http://localhost:3000/health
+curl http://localhost/             <span class="cm"># via nginx</span>
+
+<span class="cm"># Check containers are healthy</span>
+docker compose ps
+
+<span class="cm"># Stop when done</span>
+docker compose down</pre></div>
+<div class="ok">✓ Visit http://localhost in your browser — you should see this dashboard!</div>`},
+
+  {n:'13',title:'Add GitHub Secrets for deployment',pill:'cfg',pillClass:'pill-cfg',body:`
+<p class="step-desc">Go to: <strong>github.com/SumitaM-tech/devops_mini_project → Settings → Secrets and variables → Actions</strong></p>
+<div class="code-block"><div class="code-top"><span class="code-fn">Generate SSH key (run locally)</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre><span class="cm"># Create a dedicated deploy key (no passphrase)</span>
+ssh-keygen -t ed25519 -C "devops-mini-deploy" -f ~/.ssh/devops_deploy -N ""
+
+<span class="cm"># Add public key to your server</span>
+ssh-copy-id -i ~/.ssh/devops_deploy.pub ubuntu@YOUR_SERVER_IP
+
+<span class="cm"># Copy private key — paste this as SSH_PRIVATE_KEY secret</span>
+cat ~/.ssh/devops_deploy</pre></div>
+<div class="code-block" style="margin-top:10px"><div class="code-top"><span class="code-fn">3 secrets to add in GitHub</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>SERVER_HOST     = your-server-ip  <span class="cm"># e.g. 165.22.100.50</span>
+SERVER_USER     = ubuntu          <span class="cm"># your SSH user</span>
+SSH_PRIVATE_KEY = -----BEGIN OPENSSH PRIVATE KEY-----
+                  ... paste entire key content ...
+                  -----END OPENSSH PRIVATE KEY-----</pre></div>
+<div class="note">GITHUB_TOKEN is provided automatically — you do NOT need to add it.</div>`},
+
+  {n:'14',title:'Set up production server',pill:'cmd',pillClass:'pill-cmd',body:`
+<p class="step-desc">SSH into your server (Ubuntu 22.04) and run these commands.</p>
+<div class="code-block"><div class="code-top"><span class="code-fn">server terminal</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre><span class="cm"># Install Docker</span>
+curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER && newgrp docker
+
+<span class="cm"># Create project directory</span>
+sudo mkdir -p /opt/devops_mini_project
+sudo chown $USER:$USER /opt/devops_mini_project
+
+<span class="cm"># From your LOCAL machine, copy compose files:</span>
+scp docker-compose.yml ubuntu@YOUR_SERVER_IP:/opt/devops_mini_project/
+scp -r nginx/ ubuntu@YOUR_SERVER_IP:/opt/devops_mini_project/
+
+<span class="cm"># Back on server — create .env</span>
+cat > /opt/devops_mini_project/.env << 'EOF'
+NODE_ENV=production
+APP_VERSION=1.0.0
+DOCKER_IMAGE=ghcr.io/sumitam-tech/devops_mini_project
+EOF</pre></div>`},
+
+  {n:'15',title:'Push to GitHub → pipeline runs automatically',pill:'deploy',pillClass:'pill-deploy',body:`
+<div class="code-block"><div class="code-top"><span class="code-fn">terminal — project root</span><button class="copy-btn" onclick="cp(this)">Copy</button></div>
+<pre>git add .
+git status                          <span class="cm"># verify all files are staged</span>
+git commit -m "feat: initial CI/CD pipeline 🚀"
+git push origin main</pre></div>
+<div class="ok">✓ Open github.com/SumitaM-tech/devops_mini_project/actions to watch live!</div>
+<div class="code-block" style="margin-top:10px"><div class="code-top"><span class="code-fn">Expected pipeline output</span></div>
+<pre><span class="va">✅ Test</span>      ~30s  npm ci + jest
+<span class="va">✅ Build</span>     ~60s  docker buildx + push to ghcr.io
+<span class="va">✅ Deploy</span>    ~30s  ssh + docker compose up
+<span class="va">✅ Health</span>    ~15s  curl /health → 200 OK</pre></div>`}
+];
+
+var grid=document.getElementById('stepsGrid');
+STEPS.forEach(function(s,i){
+  var el=document.createElement('div');
+  el.className='step'+(i===0?' open':'');
+  el.innerHTML='<div class="step-head" onclick="tog(this)">'
+    +'<div class="step-n">'+s.n+'</div>'
+    +'<div class="step-ttl">'+s.title+'</div>'
+    +'<span class="step-pill '+s.pillClass+'">'+s.pill+'</span>'
+    +'<span class="step-arr">▼</span>'
+    +'</div>'
+    +'<div class="step-body">'+s.body+'</div>';
+  grid.appendChild(el);
+});
+
+function tog(h){
+  var c=h.parentElement,o=c.classList.contains('open');
+  document.querySelectorAll('.step').forEach(function(e){e.classList.remove('open')});
+  if(!o)c.classList.add('open');
+}
+function cp(btn){
+  var pre=btn.closest('.code-block').querySelector('pre');
+  navigator.clipboard.writeText(pre.innerText||pre.textContent).then(function(){
+    btn.textContent='Copied!';
+    setTimeout(function(){btn.textContent='Copy'},2000);
+  });
+}
+</script>
+</body>
+</html>

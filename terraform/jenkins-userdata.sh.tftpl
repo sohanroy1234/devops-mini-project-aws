@@ -1,0 +1,32 @@
+#!/bin/bash
+# Bootstraps a Jenkins server on Ubuntu 22.04. Log: /var/log/jenkins-bootstrap.log
+exec > /var/log/jenkins-bootstrap.log 2>&1
+set -eux
+export DEBIAN_FRONTEND=noninteractive
+
+apt-get update -y
+apt-get install -y ca-certificates curl gnupg unzip jq git fontconfig openjdk-17-jre docker.io
+
+# Node.js 18 (for npm ci / jest)
+curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+apt-get install -y nodejs
+
+# AWS CLI v2
+curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+unzip -q /tmp/awscliv2.zip -d /tmp
+/tmp/aws/install
+
+# Jenkins LTS
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key -o /usr/share/keyrings/jenkins-keyring.asc
+echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/" > /etc/apt/sources.list.d/jenkins.list
+apt-get update -y
+apt-get install -y jenkins
+
+# Default region for every pipeline
+echo "AWS_DEFAULT_REGION=${aws_region}" >> /etc/environment
+
+usermod -aG docker jenkins
+systemctl enable --now docker
+systemctl enable --now jenkins
+systemctl restart jenkins
+echo "Bootstrap finished"
